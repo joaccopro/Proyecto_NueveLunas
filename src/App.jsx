@@ -1,122 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useCallback } from 'react';
+import { loadData, KEYS } from './utils/storage';
+import './App.css';
+
+import SplashScreen from './pages/SplashScreen';
+import PatientRegister from './pages/PatientRegister';
+import ObstetricData from './pages/ObstetricData';
+import EmergencyContacts from './pages/EmergencyContacts';
+import HealthCenter from './pages/HealthCenter';
+import Dashboard from './pages/Dashboard';
+import MyInfo from './pages/MyInfo';
+import PregnancyControl from './pages/PregnancyControl';
+import AlarmSigns from './pages/AlarmSigns';
+import Emergency from './pages/Emergency';
+import EmergencyMap from './pages/EmergencyMap';
+import AlertSent from './pages/AlertSent';
+import AlertHistory from './pages/AlertHistory';
+import Reminders from './pages/Reminders';
+import Profile from './pages/Profile';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState('splash');
+
+  const navigateTo = useCallback((page) => {
+    /* Handle special dashboard card links that point to
+       read-only variants of the registration forms. */
+    if (page === 'emergencyContacts_view') {
+      setCurrentPage('myInfo');
+      return;
+    }
+    if (page === 'healthCenter_view') {
+      setCurrentPage('myInfo');
+      return;
+    }
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'splash':
+        return <SplashScreen onNavigate={navigateTo} />;
+      case 'patientRegister':
+        return <PatientRegister onNavigate={navigateTo} />;
+      case 'obstetricData':
+        return <ObstetricData onNavigate={navigateTo} />;
+      case 'emergencyContacts':
+        return <EmergencyContacts onNavigate={navigateTo} />;
+      case 'healthCenter':
+        return <HealthCenter onNavigate={navigateTo} />;
+      case 'dashboard':
+        return <Dashboard onNavigate={navigateTo} />;
+      case 'myInfo':
+        return <MyInfo onNavigate={navigateTo} />;
+      case 'pregnancyControl':
+        return <PregnancyControl onNavigate={navigateTo} />;
+      case 'alarmSigns':
+        return <AlarmSigns onNavigate={navigateTo} />;
+      case 'emergency':
+        return <Emergency onNavigate={navigateTo} />;
+      case 'emergencyMap':
+        return <EmergencyMap onNavigate={navigateTo} />;
+      case 'alertSent':
+        return <AlertSent onNavigate={navigateTo} />;
+      case 'alertHistory':
+        return <AlertHistory onNavigate={navigateTo} />;
+      case 'reminders':
+        return <Reminders onNavigate={navigateTo} />;
+      case 'profile':
+        return <Profile onNavigate={navigateTo} />;
+      default:
+        return <SplashScreen onNavigate={navigateTo} />;
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="app-shell">
+      {renderPage()}
+    </div>
+  );
 }
 
-export default App
+export default App;
