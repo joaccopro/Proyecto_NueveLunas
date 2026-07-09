@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { saveData, loadData, KEYS } from '../utils/storage';
+import { getTodayStr, addDays } from '../utils/validation';
 
-function ObstetricData({ onNavigate }) {
+function ObstetricData({ onNavigate, goBack }) {
   const existing = loadData(KEYS.OBSTETRIC, {});
   const [form, setForm] = useState({
     semanasGestacion: existing.semanasGestacion || '',
@@ -15,13 +16,63 @@ function ObstetricData({ onNavigate }) {
     alergias: existing.alergias || '',
   });
 
+  const [errors, setErrors] = useState({});
+  const [manualFPP, setManualFPP] = useState(false);
+
+  const todayStr = getTodayStr();
+  const minFUM = addDays(todayStr, -294);
+  const maxFPP = addDays(todayStr, 294);
+
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => {
+      const nextForm = { ...prev, [field]: value };
+      
+      // Auto-calculate FPP when FUM changes, if not in manual mode
+      if (field === 'fum' && !manualFPP && value) {
+        nextForm.fpp = addDays(value, 280);
+      }
+      return nextForm;
+    });
+
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
   };
+
+  // Update warnings during render based on current state
+  const calculatedWarning = (!manualFPP && form.fpp && form.fpp < todayStr) 
+    ? 'Revisa la FUM ingresada, la fecha probable de parto ya habría pasado' 
+    : '';
 
   const handleNext = (e) => {
     e.preventDefault();
     if (!form.semanasGestacion) return;
+
+    const newErrors = {};
+
+    // Validate FUM
+    if (form.fum) {
+      if (form.fum > todayStr) {
+        newErrors.fum = 'La fecha de última menstruación no puede ser futura';
+      } else if (form.fum < minFUM) {
+        newErrors.fum = 'La fecha de última menstruación no puede superar aproximadamente 42 semanas';
+      }
+    }
+
+    // Validate FPP
+    if (form.fpp) {
+      if (form.fpp < todayStr) {
+        newErrors.fpp = 'La fecha probable de parto no puede ser anterior a hoy';
+      } else if (form.fpp > maxFPP) {
+        newErrors.fpp = 'La fecha probable de parto no puede superar aproximadamente 42 semanas desde hoy';
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     saveData(KEYS.OBSTETRIC, form);
     onNavigate('emergencyContacts');
   };
@@ -50,28 +101,46 @@ function ObstetricData({ onNavigate }) {
           />
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Fecha última menstruación</label>
-            <input
-              className="form-input"
-              type="date"
-              value={form.fum}
-              onChange={(e) => handleChange('fum', e.target.value)}
-            />
-          </div>
-          <div className="form-group">
+        <div className="form-group">
+          <label className="form-label">Fecha última menstruación</label>
+          <input
+            className={`form-input ${errors.fum ? 'input-error' : ''}`}
+            type="date"
+            value={form.fum}
+            onChange={(e) => handleChange('fum', e.target.value)}
+            min={minFUM}
+            max={todayStr}
+          />
+          {errors.fum && <span className="error-text">{errors.fum}</span>}
+        </div>
+        
+        <div className="form-group">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <label className="form-label">Fecha probable de parto</label>
-            <input
-              className="form-input"
-              type="date"
-              value={form.fpp}
-              onChange={(e) => handleChange('fpp', e.target.value)}
-            />
+            <label style={{ fontSize: '0.8rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={manualFPP} 
+                onChange={(e) => setManualFPP(e.target.checked)} 
+              />
+              Editar FPP manualmente
+            </label>
           </div>
+          <input
+            className={`form-input ${errors.fpp ? 'input-error' : ''}`}
+            type="date"
+            value={form.fpp}
+            onChange={(e) => handleChange('fpp', e.target.value)}
+            min={todayStr}
+            max={maxFPP}
+            readOnly={!manualFPP}
+            style={{ backgroundColor: !manualFPP ? 'var(--color-gray-100)' : 'transparent' }}
+          />
+          {errors.fpp && <span className="error-text">{errors.fpp}</span>}
+          {!errors.fpp && calculatedWarning && <span className="error-text" style={{ color: '#E8A317' }}>⚠️ {calculatedWarning}</span>}
         </div>
 
-        <div className="form-row">
+        <div className="form-row mt-12">
           <div className="form-group">
             <label className="form-label">N° de gestaciones</label>
             <input

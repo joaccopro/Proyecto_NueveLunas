@@ -5,10 +5,15 @@ export const KEYS = {
   OBSTETRIC: 'nl_obstetric',
   CONTACTS: 'nl_contacts',
   HEALTH_CENTER: 'nl_health_center',
+  HEALTH_CENTERS: 'nl_health_centers',
   CONTROLS: 'nl_controls',
   ALERTS: 'nl_alerts',
   REMINDERS: 'nl_reminders',
+  APPOINTMENTS: 'nl_appointments',
+  THEME: 'nl_theme',
   REGISTERED: 'nl_registered',
+  PROFILE_PHOTO: 'nl_profile_photo',
+  USER_LOCATION: 'nl_user_location',
 };
 
 export function saveData(key, data) {

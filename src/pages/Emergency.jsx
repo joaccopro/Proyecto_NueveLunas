@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-function Emergency({ onNavigate }) {
+function Emergency({ onNavigate, goBack }) {
   const [phase, setPhase] = useState('ready'); // 'ready' | 'counting'
   const [count, setCount] = useState(5);
   const intervalRef = useRef(null);

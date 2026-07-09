@@ -1,10 +1,14 @@
 import { loadData, KEYS } from '../utils/storage';
 
-function MyInfo({ onNavigate }) {
+function MyInfo({ onNavigate, goBack }) {
   const patient = loadData(KEYS.PATIENT, {});
   const obstetric = loadData(KEYS.OBSTETRIC, {});
   const contacts = loadData(KEYS.CONTACTS, []);
+  const healthCenters = loadData(KEYS.HEALTH_CENTERS, []);
   const healthCenter = loadData(KEYS.HEALTH_CENTER, {});
+  const profilePhoto = loadData(KEYS.PROFILE_PHOTO, null);
+
+  const initial = patient.nombres ? patient.nombres.charAt(0).toUpperCase() : '?';
 
   const renderSection = (title, rows) => (
     <div style={{ marginBottom: 20 }}>
@@ -20,13 +24,28 @@ function MyInfo({ onNavigate }) {
     </div>
   );
 
+  /* Use health centers array, fallback to single center */
+  const centersToShow = healthCenters.length > 0 ? healthCenters : (healthCenter.nombre ? [healthCenter] : []);
+
   return (
     <div className="page">
       <div className="page-header">
-        <button className="back-btn" onClick={() => onNavigate('dashboard')} type="button">
+        <button className="back-btn" onClick={goBack} type="button">
           ←
         </button>
         <h1>Mi Información</h1>
+      </div>
+
+      {/* Profile photo */}
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        {profilePhoto ? (
+          <img src={profilePhoto} alt="Foto de perfil" className="myinfo-photo" />
+        ) : (
+          <div className="profile-avatar">{initial}</div>
+        )}
+        <div className="profile-name" style={{ marginTop: 8 }}>
+          {patient.nombres || 'Gestante'} {patient.apellidos || ''}
+        </div>
       </div>
 
       {renderSection('Datos Personales', [
@@ -73,15 +92,40 @@ function MyInfo({ onNavigate }) {
         )}
       </div>
 
-      {renderSection('Establecimiento de Salud', [
-        { label: 'Centro de salud', value: healthCenter.nombre },
-        { label: 'Obstetra', value: healthCenter.obstetra },
-        { label: 'Teléfono', value: healthCenter.telefono },
-        { label: 'Dirección', value: healthCenter.direccion },
-      ])}
+      <div style={{ marginBottom: 20 }}>
+        <h3 className="section-title">Establecimientos de Salud</h3>
+        {centersToShow.length > 0 ? centersToShow.map((center, i) => (
+          <div className="card" key={i} style={{ marginBottom: 8 }}>
+            <div className="info-row">
+              <span className="info-key">Centro de salud</span>
+              <span className="info-value">{center.nombre}</span>
+            </div>
+            {center.obstetra && (
+              <div className="info-row">
+                <span className="info-key">Obstetra</span>
+                <span className="info-value">{center.obstetra}</span>
+              </div>
+            )}
+            {center.telefono && (
+              <div className="info-row">
+                <span className="info-key">Teléfono</span>
+                <span className="info-value">{center.telefono}</span>
+              </div>
+            )}
+            {center.direccion && (
+              <div className="info-row">
+                <span className="info-key">Dirección</span>
+                <span className="info-value">{center.direccion}</span>
+              </div>
+            )}
+          </div>
+        )) : (
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Sin establecimientos registrados</p>
+        )}
+      </div>
 
-      <button className="btn btn-secondary" onClick={() => onNavigate('dashboard')} type="button">
-        ← Volver al inicio
+      <button className="btn btn-secondary" onClick={goBack} type="button">
+        ← Volver
       </button>
     </div>
   );

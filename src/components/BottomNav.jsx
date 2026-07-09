@@ -2,7 +2,7 @@ function BottomNav({ currentPage, onNavigate }) {
   const tabs = [
     { id: 'dashboard', icon: '🏠', label: 'Inicio' },
     { id: 'alertHistory', icon: '📋', label: 'Historial' },
-    { id: 'reminders', icon: '⏰', label: 'Recordatorios' },
+    { id: 'appointments', icon: '📅', label: 'Citas' },
     { id: 'profile', icon: '👤', label: 'Perfil' },
   ];
 

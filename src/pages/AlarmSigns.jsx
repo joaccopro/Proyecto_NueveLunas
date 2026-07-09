@@ -1,4 +1,4 @@
-function AlarmSigns({ onNavigate }) {
+function AlarmSigns({ onNavigate, goBack }) {
   const signs = [
     { icon: '🩸', title: 'Sangrado vaginal', desc: 'Cualquier tipo de sangrado durante el embarazo requiere atención inmediata.' },
     { icon: '💧', title: 'Pérdida de líquido amniótico', desc: 'Salida de líquido claro o con olor por la vagina antes del momento del parto.' },
@@ -13,7 +13,7 @@ function AlarmSigns({ onNavigate }) {
   return (
     <div className="page">
       <div className="page-header">
-        <button className="back-btn" onClick={() => onNavigate('dashboard')} type="button">
+        <button className="back-btn" onClick={goBack} type="button">
           ←
         </button>
         <h1>Signos de Alarma</h1>
@@ -36,8 +36,8 @@ function AlarmSigns({ onNavigate }) {
         </div>
       ))}
 
-      <button className="btn btn-secondary mt-20" onClick={() => onNavigate('dashboard')} type="button">
-        ← Volver al inicio
+      <button className="btn btn-secondary mt-20" onClick={goBack} type="button">
+        ← Volver
       </button>
     </div>
   );

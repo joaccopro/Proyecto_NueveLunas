@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { saveData, loadData, KEYS } from '../utils/storage';
 
-function PregnancyControl({ onNavigate }) {
+function PregnancyControl({ onNavigate, goBack }) {
   const obstetric = loadData(KEYS.OBSTETRIC, {});
   const [controls, setControls] = useState(loadData(KEYS.CONTROLS, []));
   const [showForm, setShowForm] = useState(false);
@@ -33,7 +33,7 @@ function PregnancyControl({ onNavigate }) {
   return (
     <div className="page">
       <div className="page-header">
-        <button className="back-btn" onClick={() => onNavigate('dashboard')} type="button">
+        <button className="back-btn" onClick={goBack} type="button">
           ←
         </button>
         <h1>Control del Embarazo</h1>
